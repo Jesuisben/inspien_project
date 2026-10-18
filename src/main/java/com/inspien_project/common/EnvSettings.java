@@ -34,6 +34,10 @@ public class EnvSettings {
     private String testDbUsername;
     private String testDbPassword;
 
+    // 영수증 파일의 저장 위치와 내용의 문자 인코딩임.
+    private String receiptDirectory = "private/receipts";
+    private String receiptCharset = "EUC-KR";
+
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties(EnvSettings.class)
     static class SettingsConfig { }
