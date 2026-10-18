@@ -4,6 +4,8 @@ package com.inspien_project.common;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
@@ -22,6 +24,16 @@ public class EnvSettings {
     private String baseUsername;
     private String basePassword;
 
+    // 회사 응답의 지원자 키와 주문 DB 접속 정보
+    private String applicantKey;
+    private String orderDbUrl;
+    private String orderDbUsername;
+    private String orderDbPassword;
+
+    // 회사 DB와 분리한 로컬 MySQL 검증 계정
+    private String testDbUsername;
+    private String testDbPassword;
+
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties(EnvSettings.class)
     static class SettingsConfig { }
@@ -36,5 +48,16 @@ public class EnvSettings {
         try (var context = application.run()) {
             return context.getBean(EnvSettings.class);
         }
+    }
+
+    // DB 연결 생성 함수에 값을 함께 전달하기 위한 묶음
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Target {
+        private String url;
+        private String username;
+        private String password;
     }
 }

@@ -64,6 +64,12 @@
 			<artifactId>commons-net</artifactId>
 			<version>3.13.0</version>
 		</dependency>
+        <!-- 회사 주문 DB의 Oracle JDBC URL에 연결할 때 사용함. -->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc11</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 	</dependencies>
 
 	<build>
