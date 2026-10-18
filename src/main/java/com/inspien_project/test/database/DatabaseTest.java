@@ -15,6 +15,7 @@ public class DatabaseTest {
             var envSettings = EnvSettings.load();
             StringBuilder report = new StringBuilder();
             checkTable(envSettings.getOrderDbUrl(), envSettings.getOrderDbUsername(), envSettings.getOrderDbPassword(), "ORDER_TB", report);
+            checkTable(envSettings.getShipmentDbUrl(), envSettings.getShipmentDbUsername(), envSettings.getShipmentDbPassword(), "SHIPMENT_TB", report);
             Path path = Path.of("private/SchemaReport.txt");
             Files.createDirectories(path.getParent());
             Files.writeString(path, report, StandardCharsets.UTF_8, StandardOpenOption.CREATE,

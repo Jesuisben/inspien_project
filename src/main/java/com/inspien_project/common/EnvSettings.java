@@ -39,6 +39,11 @@ public class EnvSettings {
     private String ftpPassword;
     private String ftpDirectory = "/";
     private String ftpControlEncoding = "UTF-8";
+    private String shipmentDbUrl;
+    private String shipmentDbUsername;
+    private String shipmentDbPassword;
+    private boolean batchEnabled;
+    private String batchCron = "0 */5 * * * *";
 
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties(EnvSettings.class)

@@ -19,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import com.inspien_project.common.EnvSettings;
 import com.inspien_project.repository.OrderRepository;
+import com.inspien_project.repository.ShipmentRepository;
 
 public final class OrderTestHelper {
 
@@ -73,6 +74,8 @@ public final class OrderTestHelper {
         private OrderRepository orderRepository;
         private OrderService orderService;
         private TestFtpService ftpService;
+        private JdbcTemplate shipmentJdbc;
+        private ShipmentRepository shipmentRepository;
         public int countOrders(String applicantKey) {
             return orderJdbc.queryForObject("SELECT COUNT(*) FROM ORDER_TB WHERE APPLICANT_KEY = ?", Integer.class, applicantKey);
         }
@@ -119,6 +122,15 @@ public final class OrderTestHelper {
         testData.setFtpService(ftpService);
         testData.setOrderService(new OrderService(settings, new OrderXmlMapper(), orderRepository,
                 new ReceiptService(settings), ftpService, transactionTemplate));
+        var shipmentJdbc = new JdbcTemplate(createTestDataSource("inspien_shipment_test"));
+        shipmentJdbc.execute("DROP TABLE IF EXISTS SHIPMENT_TB");
+        shipmentJdbc.execute("""
+                CREATE TABLE SHIPMENT_TB (SHIPMENT_ID VARCHAR(4), APPLICANT_KEY VARCHAR(128),
+                ORDER_ID VARCHAR(4), ITEM_ID VARCHAR(128), ADDRESS VARCHAR(1024),
+                PRIMARY KEY (SHIPMENT_ID, APPLICANT_KEY))
+                """);
+        testData.setShipmentJdbc(shipmentJdbc);
+        testData.setShipmentRepository(new ShipmentRepository(shipmentJdbc));
         return testData;
     }
 }

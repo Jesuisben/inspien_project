@@ -24,6 +24,11 @@ public class DatabaseConfig {
         return createDataSource(new EnvSettings.Target(envSettings.getOrderDbUrl(), envSettings.getOrderDbUsername(), envSettings.getOrderDbPassword()));
     }
 
+    @Bean("shipmentDataSource")
+    DataSource shipmentDataSource(EnvSettings envSettings) {
+        return createDataSource(new EnvSettings.Target(envSettings.getShipmentDbUrl(), envSettings.getShipmentDbUsername(), envSettings.getShipmentDbPassword()));
+    }
+
     private DataSource createDataSource(EnvSettings.Target target) {
         if (target == null) throw new IllegalArgumentException("DB 설정이 없습니다.");
         checkSetting(target.getUrl(), "JDBC URL");
@@ -43,6 +48,11 @@ public class DatabaseConfig {
 
     @Bean("orderJdbc")
     JdbcTemplate orderJdbc(@Qualifier("orderDataSource") DataSource dataSource) {
+        return createJdbcTemplate(dataSource);
+    }
+
+    @Bean("shipmentJdbc")
+    JdbcTemplate shipmentJdbc(@Qualifier("shipmentDataSource") DataSource dataSource) {
         return createJdbcTemplate(dataSource);
     }
 
