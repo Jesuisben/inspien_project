@@ -34,9 +34,17 @@ public class EnvSettings {
     private String testDbUsername;
     private String testDbPassword;
 
-    // 영수증 파일의 저장 위치와 내용의 문자 인코딩임.
+    // 영수증 파일의 저장 위치와 내용의 문자 인코딩
     private String receiptDirectory = "private/receipts";
     private String receiptCharset = "EUC-KR";
+
+    // 회사 제공 FTP 접속 정보이며 실제 값은 .env에서 읽음
+    private String ftpHost;
+    private int ftpPort = 21;
+    private String ftpUsername;
+    private String ftpPassword;
+    private String ftpDirectory = "/";
+    private String ftpControlEncoding = "UTF-8";
 
     @Configuration(proxyBeanMethods = false)
     @EnableConfigurationProperties(EnvSettings.class)
