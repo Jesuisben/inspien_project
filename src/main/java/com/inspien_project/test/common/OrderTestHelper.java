@@ -3,6 +3,17 @@
 package com.inspien_project.test.common;
 
 import java.nio.file.Path;
+import java.nio.file.Files;
+import java.io.IOException;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+import com.inspien_project.service.OrderService;
+import com.inspien_project.service.ReceiptService;
+import com.inspien_project.service.FtpService;
+import com.inspien_project.mapper.OrderXmlMapper;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -64,8 +75,21 @@ public final class OrderTestHelper {
         private EnvSettings settings;
         private JdbcTemplate orderJdbc;
         private OrderRepository orderRepository;
+        private OrderService orderService;
+        private TestFtpService ftpService;
         public int countOrders(String applicantKey) {
             return orderJdbc.queryForObject("SELECT COUNT(*) FROM ORDER_TB WHERE APPLICANT_KEY = ?", Integer.class, applicantKey);
+        }
+    }
+
+    // 실제 FtpService를 상속해 이 검증에서만 네트워크 전송을 메모리 저장으로 바꿈
+    public static class TestFtpService extends FtpService {
+        public final Map<String, byte[]> files = new LinkedHashMap<>();
+        public boolean fail;
+        public TestFtpService(EnvSettings settings) { super(settings); }
+        @Override public void uploadFile(Path file, String name) throws IOException {
+            if (fail) throw new IOException("SIMULATED_FTP_FAILURE");
+            files.put(name, Files.readAllBytes(file));
         }
     }
 
@@ -74,6 +98,14 @@ public final class OrderTestHelper {
         var settings = new EnvSettings();
         settings.setApplicantKey("TEST_KEY");
         settings.setName("테스트");
+        settings.setReceiptDirectory(folder.toString());
+        settings.setReceiptCharset("EUC-KR");
+        settings.setFtpHost("127.0.0.1");
+        settings.setFtpPort(1);
+        settings.setFtpUsername("test");
+        settings.setFtpPassword("test-only");
+        settings.setFtpDirectory("/");
+        settings.setFtpControlEncoding("UTF-8");
         var orderSource = createTestDataSource("inspien_order_test");
         var orderJdbc = new JdbcTemplate(orderSource);
         orderJdbc.execute("DROP TABLE IF EXISTS ORDER_TB");
@@ -88,6 +120,11 @@ public final class OrderTestHelper {
         testData.setSettings(settings);
         testData.setOrderJdbc(orderJdbc);
         testData.setOrderRepository(orderRepository);
+        var ftpService = new TestFtpService(settings);
+        var transactionTemplate = new TransactionTemplate(new JdbcTransactionManager(orderSource));
+        testData.setFtpService(ftpService);
+        testData.setOrderService(new OrderService(settings, new OrderXmlMapper(), orderRepository,
+                new ReceiptService(settings), ftpService, transactionTemplate));
         return testData;
     }
 }
