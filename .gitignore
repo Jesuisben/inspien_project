@@ -34,8 +34,9 @@ build/
 
 # 개인정보 및 실행 중 만들어지는 파일
 private/
-logs/
+docs/
 .env
 .env.*
 !.env.example
 *.log
+!/logs/**
