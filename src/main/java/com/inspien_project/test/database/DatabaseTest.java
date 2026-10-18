@@ -10,12 +10,10 @@ import javax.swing.JOptionPane;
 
 public class DatabaseTest {
 
-    // IntelliJ의 실행 버튼에서 시작하는 진입점이며 이 메서드가 호출하는 작업만 실행
     public static void main(String[] args) {
         try {
             var envSettings = EnvSettings.load();
             StringBuilder report = new StringBuilder();
-            // 조회 결과를 바꾸지 않는 SQL과 DB 메타데이터로 컬럼·제품·기본키를 확인
             checkTable(envSettings.getOrderDbUrl(), envSettings.getOrderDbUsername(), envSettings.getOrderDbPassword(), "ORDER_TB", report);
             Path path = Path.of("private/SchemaReport.txt");
             Files.createDirectories(path.getParent());
@@ -29,7 +27,6 @@ public class DatabaseTest {
         }
     }
 
-    // 조회 결과를 바꾸지 않는 SQL과 DB 메타데이터로 컬럼·제품·기본키를 확인
     private static void checkTable(String url, String username, String password, String table,
             StringBuilder report) throws Exception {
         try (var connection = DriverManager.getConnection(url, username, password);

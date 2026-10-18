@@ -1,4 +1,3 @@
-// 복호화 테스트
 
 package com.inspien_project.test.basedata;
 
@@ -14,7 +13,6 @@ import com.inspien_project.common.BaseData;
 
 public class BaseDataTest {
 
-    // 전화번호 해시에서 만든 키로 복호화 및 그 외 검증
     void testDecrypt() throws Exception {
         byte[] key = Arrays.copyOf(MessageDigest.getInstance("SHA-1")
                 .digest("010-0000-0000".getBytes(StandardCharsets.UTF_8)), 16);

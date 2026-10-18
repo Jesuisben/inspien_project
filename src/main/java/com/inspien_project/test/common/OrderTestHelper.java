@@ -1,4 +1,3 @@
-// 검증 공통 파일
 
 package com.inspien_project.test.common;
 
@@ -25,7 +24,6 @@ public final class OrderTestHelper {
 
     private OrderTestHelper() { }
 
-    // 검증 파일의 재사용 메소드
     public static void assertEquals(Object expected, Object actual) {
         if (!java.util.Objects.equals(expected, actual)) throw new IllegalStateException("기대값과 실제값 불일치");
     }
@@ -40,7 +38,6 @@ public final class OrderTestHelper {
 
     public static void assertNotNull(Object value) { assertTrue(value != null); }
 
-    // 예외처리 검증 중첩 인터페이스임
     public interface CheckAction { void run() throws Exception; }
 
     public static void assertThrows(Class<? extends Throwable> expected, CheckAction action) {
@@ -52,7 +49,6 @@ public final class OrderTestHelper {
         throw new IllegalStateException("예상한 예외가 발생하지 않음");
     }
 
-    // 회사 연결 필드는 읽지 않음. 고정된 loopback URL과 검증 전용 스키마만 사용
     private static DriverManagerDataSource createTestDataSource(String database) {
         if (!database.equals("inspien_order_test") && !database.equals("inspien_shipment_test")) {
             throw new IllegalArgumentException("검증 스키마 이름을 확인하세요.");
@@ -82,7 +78,6 @@ public final class OrderTestHelper {
         }
     }
 
-    // 실제 FtpService를 상속해 이 검증에서만 네트워크 전송을 메모리 저장으로 바꿈
     public static class TestFtpService extends FtpService {
         public final Map<String, byte[]> files = new LinkedHashMap<>();
         public boolean fail;
@@ -93,7 +88,6 @@ public final class OrderTestHelper {
         }
     }
 
-    // 호출할 때 로컬 검증 스키마의 테이블을 새로 만듦. 해당 두 스키마에는 개인 자료를 넣지 않음
     public static TestData createTestData(Path folder) {
         var settings = new EnvSettings();
         settings.setApplicantKey("TEST_KEY");

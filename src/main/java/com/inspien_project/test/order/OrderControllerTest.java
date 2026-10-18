@@ -9,7 +9,6 @@ import static com.inspien_project.test.common.OrderTestHelper.*;
 
 public class OrderControllerTest {
 
-    // 먼저 실제 앱을 실행함. 아래 세 요청은 유효한 주문이 아니므로 회사 DB·FTP에 쓰면 안 됨
     public static void main(String[] args) throws Exception {
         checkRequest("text/plain", "bad", 415);
         checkRequest("application/xml", "", 400);

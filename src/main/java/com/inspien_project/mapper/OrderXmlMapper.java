@@ -1,4 +1,3 @@
-// 초기 데이터인 XML의 header와 item을 java의 user_Id와 매핑
 
 package com.inspien_project.mapper;
 
@@ -30,7 +29,6 @@ import com.inspien_project.dto.OrderInputDto;
 @Component
 public class OrderXmlMapper {
 
-    // 변환된 주문과 제외·경고 건수를 한 요청의 결과로 함께 전달
     @Getter
     @AllArgsConstructor
     public static class ParseResult {
@@ -40,7 +38,6 @@ public class OrderXmlMapper {
         private final int emptyHeaderCount;
     }
 
-    // XML 확인 후 USER_ID가 일치하는 주문만 생성
     public ParseResult parse(byte[] bytes) {
         if (bytes == null || bytes.length == 0 || bytes.length > 1_048_576) {
             throw new IllegalArgumentException("XML 크기 1바이트 이상 1MiB 이하여야 함");
@@ -62,15 +59,12 @@ public class OrderXmlMapper {
             });
 
             var document = builder.parse(new InputSource(new StringReader(readXml(bytes))));
-            // 같은 USER_ID로 연결
             Map<String, Element> headers = new LinkedHashMap<>();
             var headerNodes = document.getElementsByTagNameNS("*", "HEADER");
             for (int index = 0; index < headerNodes.getLength(); index++) {
                 Element header = (Element) headerNodes.item(index);
                 String userId = getValue(header, "USER_ID");
-                // 필수 값과 파일 구분 문자를 검사해서 DB 값과 영수증이 어긋나는 것을 막음
                 getValue(header, "NAME");
-                // 필수 값과 파일 구분 문자를 검사해서 DB 값과 영수증이 어긋나는 것을 막음
                 getValue(header, "ADDRESS");
                 if (!"N".equals(getStatus(header))) {
                     throw new IllegalArgumentException("신규 주문의 STATUS는 N이어야 함");
@@ -83,7 +77,6 @@ public class OrderXmlMapper {
             List<OrderInputDto> result = new ArrayList<>();
             Set<String> usedHeaders = new HashSet<>();
             int rejectedCount = 0;
-            // ITEM앞에 다른 문자가 있어도 이름을 찾고 ITEM 하나당 주문 한 행을 생성
             var items = document.getElementsByTagNameNS("*", "ITEM");
             for (int index = 0; index < items.getLength(); index++) {
                 Element item = (Element) items.item(index);
@@ -95,7 +88,6 @@ public class OrderXmlMapper {
                     throw new IllegalArgumentException("PRICE는 양수여야함");
                 }
                 Element header = headers.get(userId);
-                // 관계 오류 ITEM 제외해서 응답 맟 로그 설계
                 if (header == null) {
                     rejectedCount++;
                     continue;
@@ -104,7 +96,6 @@ public class OrderXmlMapper {
                         getValue(header, "ADDRESS"), itemName, price));
                 usedHeaders.add(userId);
             }
-            // 예외 처리
             if (result.isEmpty()) throw new IllegalArgumentException("처리할 수 있는 ITEM");
             return new ParseResult(List.copyOf(result), items.getLength(), rejectedCount,
                     headers.size() - usedHeaders.size());
@@ -115,7 +106,6 @@ public class OrderXmlMapper {
         }
     }
 
-    // XML 선언이 없으면 실제 제공 형식인 EUC-KR을 사용하여 추측 변환을 막음
     private String readXml(byte[] bytes) throws CharacterCodingException {
         String prefix = new String(bytes, 0, Math.min(bytes.length, 256), StandardCharsets.ISO_8859_1);
         var declaration = Pattern.compile("^\\s*<\\?xml\\s+[^?]*encoding\\s*=\\s*['\"]([^'\"]+)['\"][^?]*\\?>")
@@ -135,17 +125,14 @@ public class OrderXmlMapper {
         return "<ROOT>" + xml + "</ROOT>";
     }
 
-    // 깨진 바이트를 오류에 기입하여 왜곡 데이터 방지
     private String decode(byte[] bytes, Charset charset) throws CharacterCodingException {
         return charset.newDecoder().decode(ByteBuffer.wrap(bytes)).toString();
     }
 
-    // STATUS에만 XML의 들여쓰기 공백을 제거하고 고객 정보는 임의로 정리안함
     private String getStatus(Element header) {
         return getChild(header, "STATUS").getTextContent().strip();
     }
 
-    // 필수 값과 파일 구분 문자를 검사해서 DB 값과 영수증이 어긋나는 것을 막음.
     private String getValue(Element parent, String name) {
         String text = getChild(parent, name).getTextContent();
         if (text.isBlank() || text.indexOf('^') >= 0 || text.indexOf('\r') >= 0 || text.indexOf('\n') >= 0) {
@@ -154,7 +141,6 @@ public class OrderXmlMapper {
         return text;
     }
 
-    // 중복 및 중첩의 모호함 방지
     private Element getChild(Element parent, String name) {
         Element found = null;
         for (Node node = parent.getFirstChild(); node != null; node = node.getNextSibling()) {

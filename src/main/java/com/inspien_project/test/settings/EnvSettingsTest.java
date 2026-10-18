@@ -1,4 +1,3 @@
-// 환경변수 출력하는 테스트
 
 package com.inspien_project.test.settings;
 
@@ -6,7 +5,6 @@ import com.inspien_project.common.EnvSettings;
 
 public class EnvSettingsTest {
 
-    // 실제 .env를 읽고 PPT 요청 항목 다음에 API 인증 항목을 순서대로 출력함.
     public static void main(String[] args) {
         EnvSettings envSettings = EnvSettings.load();
 

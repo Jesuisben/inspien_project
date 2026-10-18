@@ -58,7 +58,6 @@ public class OrderService {
         public String getReceiptFile() { return receiptFile; }
     }
 
-    // 실패 응답과 상태 대조에 필요한 주문 식별자만 추려 고객 이름·주소의 노출을 줄임
     private List<String> extractOrderIds(List<OrderDataDto> orderList) {
         List<String> ids = new ArrayList<>();
         for (OrderDataDto orderData : orderList) {
@@ -67,10 +66,7 @@ public class OrderService {
         return ids;
     }
 
-    // 단일 실행 인스턴스에서 ID 발급과 초 단위 파일명 처리를 직렬화
-    // XML 변환·주문 ID·파일 준비·DB INSERT·FTP 확인·DB 커밋 순서로 한 요청을 처리
     public synchronized Result createOrder(String requestId, byte[] xml) {
-        // XML 입력 오류는 DB 작업 전에 발생시켜 Controller가 400으로 응답하도록 함
         var parsed = orderXmlMapper.parse(xml);
         var orderInputList = parsed.getOrderList();
         if (parsed.getRejectedCount() > 0 || parsed.getEmptyHeaderCount() > 0) {
@@ -87,11 +83,9 @@ public class OrderService {
             for (var input : orderInputList) {
                 orderList.add(OrderDataDto.createOrderData(IdGenerator.createId(usedIds), envSettings.getApplicantKey(), input));
             }
-            // 파일명 충돌·인코딩 오류를 주문 INSERT 전에 확인하도록 로컬 파일을 먼저 준비
             var receipt = receiptService.createReceipt(orderList);
             receiptName = receipt.getName();
             log.info("requestId={} stage=ORDER_BEGIN count={} receipt={}", requestId, orderList.size(), receiptName);
-            // 여러 주문 INSERT를 주문 DB의 한 트랜잭션으로 묶고 FTP 실패도 예외로 전달해 롤백을 유도
             transactionTemplate.executeWithoutResult(status -> {
                 for (OrderDataDto orderData : orderList) orderRepository.save(orderData);
                 try { ftpService.uploadFile(receipt.getPath(), receipt.getName()); }
@@ -101,12 +95,10 @@ public class OrderService {
             log.info("requestId={} stage=ORDER_END result={} total={} accepted={} rejected={} emptyHeaders={} orderIds={} receipt={}",
                     requestId, result, parsed.getTotalCount(), orderList.size(), parsed.getRejectedCount(),
                     parsed.getEmptyHeaderCount(), extractOrderIds(orderList), receiptName);
-            // 콜백 종료뿐 아니라 주문 DB 커밋이 끝난 뒤에만 성공 결과를 반환
             return new Result(extractOrderIds(orderList), receiptName, parsed.getTotalCount(),
                     parsed.getRejectedCount(), parsed.getEmptyHeaderCount());
         } catch (Exception error) {
             var ids = extractOrderIds(orderList);
-            // 접속 정보나 고객 데이터가 들어갈 수 있는 예외 원문은 로그에 출력하지 않음
             log.error("requestId={} stage=ORDER_END result=FAILURE orderIds={} receipt={} errorType={}",
                     requestId, ids, receiptName, error.getClass().getSimpleName());
             throw new ProcessingFailure(ids, receiptName, error);

@@ -52,7 +52,6 @@ public class ReceiptService {
         private Path path;
     }
 
-    // 파일명 규칙과 초 단위 충돌 검사를 적용하여 로컬 영수증 파일을 준비
     public ReceiptFile createReceipt(List<OrderDataDto> orderList) throws IOException {
         String time = LocalDateTime.now(clock)
                 .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
@@ -60,13 +59,11 @@ public class ReceiptService {
         Path folder = Path.of(envSettings.getReceiptDirectory()).toAbsolutePath();
         Files.createDirectories(folder);
         Path path = folder.resolve(name);
-        // 초 단위 파일명이 충돌하면 실패시켜 기존 영수증 덮어쓰기를 막음
         Files.write(path, toReceiptBytes(orderList, Charset.forName(envSettings.getReceiptCharset())),
                 StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE);
         return new ReceiptFile(name, path);
     }
 
-    // PPT의 8개 필드 순서와 LF를 지키며 표현 불가능한 문자를 물음표로 바꾸지 않고 실패시킴
     public static byte[] toReceiptBytes(List<OrderDataDto> orderList, Charset charset) throws IOException {
         StringBuilder text = new StringBuilder();
         for (OrderDataDto orderData : orderList) {

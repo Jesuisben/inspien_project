@@ -1,4 +1,3 @@
-// 초기 데이터 xml의 변환결과 테스트
 
 package com.inspien_project.test.order;
 

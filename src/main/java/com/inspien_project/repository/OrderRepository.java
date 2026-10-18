@@ -14,13 +14,11 @@ public class OrderRepository {
 
     public OrderRepository(@Qualifier("orderJdbc") JdbcTemplate jdbcTemplate) { this.jdbcTemplate = jdbcTemplate; }
 
-    // 본인 지원자 키에 속한 기존 ID만 읽어 다른 지원자 데이터와 채번 범위를 구분
     public Set<String> findOrderIdsByApplicantKey(String key) {
         return new HashSet<>(jdbcTemplate.queryForList(
                 "SELECT ORDER_ID FROM ORDER_TB WHERE APPLICANT_KEY = ?", String.class, key));
     }
 
-    // 컬럼 순서에 맞춰 값을 바인딩하고 정확히 한 행을 저장했는지 확인
     public void save(OrderDataDto orderData) {
         int count = jdbcTemplate.update("""
                 INSERT INTO ORDER_TB

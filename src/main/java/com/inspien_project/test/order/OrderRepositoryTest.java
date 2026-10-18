@@ -8,7 +8,6 @@ import static com.inspien_project.test.common.OrderTestHelper.*;
 
 public class OrderRepositoryTest {
 
-    // 로컬 DB만 초기화, 주문(회사) DB에는 쓰지 않음
     public static void main(String[] args) {
         var testData = OrderTestHelper.createTestData(Path.of("target/checks"));
         var orderRepository = testData.getOrderRepository();

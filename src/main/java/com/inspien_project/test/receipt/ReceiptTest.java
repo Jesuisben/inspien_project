@@ -16,10 +16,8 @@ import com.inspien_project.service.ReceiptService;
 
 public class ReceiptTest {
 
-    // main에서 직접 호출하는 검증 사례임. 예상 결과가 다르면 예외로 중단
     Path folder;
 
-    // 영수증 이름·내용을 확인하고 같은 초의 파일을 덮어쓰지 않는지 검사
     void testReceiptFile() throws Exception {
         var settings = new EnvSettings();
         settings.setApplicantKey("KEY");

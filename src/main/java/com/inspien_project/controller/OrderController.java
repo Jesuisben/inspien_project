@@ -21,7 +21,6 @@ public class OrderController {
     private static final Logger log = LoggerFactory.getLogger(OrderController.class);
     private final OrderService orderService;
 
-    // XML POST 요청을 이 메서드에 연결하고 결과는 JSON으로 반환
     @PostMapping(value = "/orders", consumes = MediaType.APPLICATION_XML_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> createOrder(@RequestBody byte[] xml, HttpServletRequest request) {

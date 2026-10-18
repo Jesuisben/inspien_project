@@ -1,4 +1,3 @@
-// 초기 데이터 수신, 복호화 및 저장
 
 package com.inspien_project.common;
 
@@ -35,14 +34,12 @@ public class BaseData {
 
     public static void main(String[] args) {
         try {
-            // 환경변수 이용
             EnvSettings settings = EnvSettings.load();
             String name = required(settings.getName(), "NAME");
             String phoneNumber = required(settings.getPhoneNumber(), "PHONE_NUMBER");
             String email = required(settings.getEmail(), "E_MAIL");
             String baseUsername = required(settings.getBaseUsername(), "baseUsername");
             String basePassword = required(settings.getBasePassword(), "basePassword");
-            // 예외 처리
             if (!phoneNumber.matches("010-[0-9]{4}-[0-9]{4}")) {
                 throw new IllegalArgumentException("PHONE_NUMBER_FORMAT");
             }
@@ -55,11 +52,9 @@ public class BaseData {
                     .header("Content-Type", "application/json")
                     .header("Authorization", "Basic " + authorization)
                     .POST(HttpRequest.BodyPublishers.ofByteArray(body)).build();
-            // 응답 제한 로직
             var response = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
                     .send(request, HttpResponse.BodyHandlers.ofByteArray());
             if (response.statusCode() != 200) {
-                // 오류 대처
                 JOptionPane.showMessageDialog(null, "HTTP " + response.statusCode()
                         + "입니다. 입력과 PPT의 API 인증정보 다시 확인");
                 return;
@@ -89,18 +84,16 @@ public class BaseData {
                     json.writerWithDefaultPrettyPrinter().writeValueAsString(connections), StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE_NEW);
 
-            // 파일 저장
             Files.write(folder.resolve("Sample.xml"), Base64.getDecoder().decode(
                     root.get("SAMPLE_DATA").asString().replaceAll("\\s", "")), StandardOpenOption.CREATE_NEW);
             JOptionPane.showMessageDialog(null, "저장 위치: " + folder + "\n복호화한 값 개수: " + decoded[0]
                     + "\nConnectionInfo.json, Sample.xml 확인");
-        } catch (Exception error) { // 예외 처리
+        } catch (Exception error) {         
             JOptionPane.showMessageDialog(null, "요청 및 파일 저장 실패: " + error.getClass().getSimpleName()
                     + "\n네트워크 및 응답 확인");
         }
     }
 
-    // 필수 설정이 없거나 예시 값 그대로면 중단함.
     private static String required(String value, String name) {
         if (value == null || value.isBlank() || value.contains("입력해야함")) {
             throw new IllegalArgumentException("설정 확인: " + name);
@@ -108,7 +101,6 @@ public class BaseData {
         return value;
     }
 
-    // Base64를 AES 방식으로 복호화함.
     public static String decrypt(String encoded, byte[] key) throws Exception {
         byte[] cipherBytes = Base64.getDecoder().decode(encoded.replaceAll("\\s", ""));
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");

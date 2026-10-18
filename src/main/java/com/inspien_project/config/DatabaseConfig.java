@@ -24,7 +24,6 @@ public class DatabaseConfig {
         return createDataSource(new EnvSettings.Target(envSettings.getOrderDbUrl(), envSettings.getOrderDbUsername(), envSettings.getOrderDbPassword()));
     }
 
-    // 같은 형태의 설정에서 연결 대상을 만들되 실제 대상은 주입받은 order 또는 shipment로 구분
     private DataSource createDataSource(EnvSettings.Target target) {
         if (target == null) throw new IllegalArgumentException("DB 설정이 없습니다.");
         checkSetting(target.getUrl(), "JDBC URL");
@@ -47,16 +46,13 @@ public class DatabaseConfig {
         return createJdbcTemplate(dataSource);
     }
 
-    // 연결 대상에 SQL 실행기를 붙이고 조회 제한 시간을 설정
     private JdbcTemplate createJdbcTemplate(DataSource dataSource) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         jdbcTemplate.setQueryTimeout(10);
         return jdbcTemplate;
     }
 
-    // 반환하는 객체를 지정된 이름으로 등록하여 주입할 때 구분할 수 있게 함
     @Bean("orderTransaction")
-    // 주문 INSERT 전체의 커밋·롤백을 묶으며 FTP 자체를 DB 트랜잭션에 포함시키지는 않음.
     TransactionTemplate orderTransaction(@Qualifier("orderDataSource") DataSource dataSource) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(new JdbcTransactionManager(dataSource));
         transactionTemplate.setTimeout(60);

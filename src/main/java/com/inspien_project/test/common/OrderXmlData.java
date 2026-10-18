@@ -1,5 +1,3 @@
-// XML의 고객 정보와 상품 정보를 USER_ID로 매핑해서
-// OrderInputDto로 올바르게 변환되는지 테스트 하기 위한 데이터
 
 package com.inspien_project.test.common;
 

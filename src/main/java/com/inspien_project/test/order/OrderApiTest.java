@@ -13,7 +13,6 @@ import javax.swing.JOptionPane;
 
 public class OrderApiTest {
 
-    // IntelliJ의 실행 버튼에서 시작하는 진입점이며 이 메서드가 호출하는 작업만 실행
     public static void main(String[] args) {
         JFileChooser chooser = new JFileChooser(Path.of("private").toAbsolutePath().toFile());
         chooser.setDialogTitle("주문 요청에 사용할 XML 파일 선택");
