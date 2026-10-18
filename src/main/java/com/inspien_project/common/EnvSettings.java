@@ -29,6 +29,7 @@ public class EnvSettings {
     // 환경변수 재사용 함수
     public static EnvSettings load() {
         SpringApplication application = new SpringApplication(SettingsConfig.class);
+        application.setHeadless(false);
         application.setWebApplicationType(WebApplicationType.NONE);
         application.setBannerMode(Banner.Mode.OFF);
         application.setLogStartupInfo(false);
