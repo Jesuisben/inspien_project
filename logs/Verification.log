@@ -7,3 +7,4 @@
 2026-10-18T23:43:17+09:00 INFO stage=SCHEMA_METADATA_CHECK result=PASS orderRequiredColumns=9 orderActualColumns=10 shipmentRequiredColumns=5 shipmentActualColumns=6 extraOrderColumn=CREATE_TIME extraShipmentColumn=CREATE_DATE
 2026-10-18T23:50:51+09:00 INFO stage=CHAPTER16_VERIFICATION result=PASS mainChecks=7 sourceHttp=415/400/400 package=SUCCESS jarStartup=SUCCESS jarHttp=415/400/400 batchEnabled=false serverRunning=false newNormalOrders=0
 2026-10-18T23:50:51+09:00 INFO stage=FIVE_MINUTE_WAIT action=SKIPPED actualCyclesObserved=0
+2026-10-19T21:50:21+09:00 INFO stage=ACTUAL_FIVE_MINUTE_RETEST result=PASS actualCyclesObserved=2 firstTotal=63 firstSuccess=63 firstFailure=0 secondTotal=0 secondSuccess=0 secondFailure=0 ordersY=63 shipmentRows=63 duplicates=0 sourceChanged=false envChanged=false batchEnabled=false serverStopped=true
